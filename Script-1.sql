@@ -68,7 +68,8 @@ select t.id as Id_insegnante, t.name as Nome, t.surname as Cognome, c.id as Id_c
 from course_teacher ct 
 inner join teachers t 
 on ct.teacher_id = t.id
-inner join courses c on ct.course_id = c.id
+inner join courses c 
+on ct.course_id = c.id
 where t.name = 'Fulvio' and t.surname = 'Amato';
 
 -- 13. Selezionare tutti gli studenti con i dati relativi al corso di laurea a cui sono iscritti e il relativo dipartimento, in ordine alfabetico per cognome e nome
@@ -77,3 +78,12 @@ from students s
 inner join `degrees` d on s.degree_id = d.id
 inner join departments dep on d.department_id = dep.id
 order by s.surname, s.name;
+
+-- BONUS Selezionare per ogni studente quanti tentativi d’esame ha sostenuto per superare ciascuno dei suoi esami
+select s.id as Id_studente, s.surname as Cognome_studente, s.name as Nome_studente, s.fiscal_code as Codice_fiscale_studente, e.id as Id_esame, count(es.exam_id) as Tentativi_esame
+from exam_student es 
+inner join students s
+on s.id = es.student_id
+inner join exams e
+on e.id = es.exam_id
+group by es.exam_id ;
