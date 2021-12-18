@@ -37,15 +37,13 @@ order by Iscritti_per_anno;
 select e.id as Id_Esame, avg(es.vote) as Media_voti
 from exams e 
 inner join exam_student es 
-where e.id = es.exam_id
+on e.id = es.exam_id
 group by e.id;
 
 -- 9. Contare quanti corsi di laurea ci sono per ogni dipartimento
-select dep.name as Nome_Dipartimento, count(c.id) as Num_Corsi 
-from courses c 
-inner join degrees d on c.degree_id = d.id 
-inner join departments dep on d.department_id = dep.id
-group by dep.name;
+select department_id, count(*) as Num_corsi_laurea_per_dipartimento
+from degrees d 
+group by department_id;
 
 -- 10. Selezionare tutti gli studenti iscritti al Corso di Laurea in Economia
 select s.surname as Cognome, s.name as Nome, d.name as Corso
@@ -61,7 +59,7 @@ from degrees d
 inner join departments dep
 on d.department_id = dep.id
 where dep.name = 'Dipartimento Di Neuroscienze'
-and d.level = 'magistrale';
+and d.`level` = 'magistrale';
 
 -- 12. Selezionare tutti i corsi in cui insegna Fulvio Amato
 select t.id as Id_insegnante, t.name as Nome, t.surname as Cognome, c.id as Id_corso, c.name as Nome_corso, c.description as Descrizione, c.period as Periodo, c.`year` , c.cfu as Crediti_formativi
@@ -80,10 +78,12 @@ inner join departments dep on d.department_id = dep.id
 order by s.surname, s.name;
 
 -- BONUS Selezionare per ogni studente quanti tentativi d’esame ha sostenuto per superare ciascuno dei suoi esami
-select s.id as Id_studente, s.surname as Cognome_studente, s.name as Nome_studente, s.fiscal_code as Codice_fiscale_studente, e.id as Id_esame, count(es.exam_id) as Tentativi_esame
-from exam_student es 
-inner join students s
-on s.id = es.student_id
-inner join exams e
-on e.id = es.exam_id
-group by es.exam_id ;
+select s.surname as Cognome_studente, s.name as Nome_studente, c.id as Id_corso, c.name as Nome_corso, count(es.vote) as Tentativi, max(es.vote) as Voto_massimo
+from students s 
+inner join exam_student es on s.id = es.student_id 
+inner join exams e on es.exam_id = e.id
+inner join courses c on c.id = e.course_id 
+group by s.id, c.id
+having voto_massimo >= 18
+order by s.surname, s.name;
+
